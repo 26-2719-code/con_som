@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2인용 주사위 대결</title>
+    <style>
+        body {
+            font-family: '맑은 고딕', sans-serif;
+            text-align: center;
+            background-color: #2c3e50;
+            color: white;
+            margin-top: 50px;
+        }
+
+        .dice-container {
+            display: flex;
+            justify-content: center;
+            gap: 80px;
+            margin: 40px 0;
+        }
+
+        .player-box {
+            text-align: center;
+            background-color: #34495e;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .dice {
+            width: 120px;
+            height: 120px;
+            background-color: white;
+            color: #2c3e50;
+            font-size: 60px;
+            font-weight: bold;
+            line-height: 120px;
+            border-radius: 20px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.4);
+            display: inline-block;
+            transition: transform 0.1s;
+            margin-bottom: 20px;
+        }
+
+        .rolling {
+            animation: shake 0.4s infinite;
+            color: #bdc3c7;
+        }
+
+        @keyframes shake {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            25% {
+                transform: rotate(15deg);
+            }
+
+            50% {
+                transform: rotate(0deg);
+            }
+
+            75% {
+                transform: rotate(-15deg);
+            }
+
+            100% {
+                transform: rotate(0deg);
+            }
+        }
+
+        button {
+            font-size: 18px;
+            padding: 12px 25px;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: transform 0.1s, opacity 0.3s;
+        }
+
+        .btn-p1 {
+            background-color: #3498db;
+        }
+
+        .btn-p1:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-p2 {
+            background-color: #e74c3c;
+        }
+
+        .btn-p2:hover {
+            background-color: #c0392b;
+        }
+
+        .btn-reset {
+            background-color: #2ecc71;
+            font-size: 22px;
+            padding: 15px 40px;
+            display: none;
+            margin: 20px auto;
+        }
+
+        .btn-reset:hover {
+            background-color: #27ae60;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #result {
+            font-size: 30px;
+            margin-top: 30px;
+            font-weight: bold;
+            min-height: 45px;
+            color: #f1c40f;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>2인용 주사위 대결</h1>
+    <p>각자 버튼을 눌러 주사위를 굴려주세요.</p>
+
+    <div class="dice-container">
+        <div class="player-box">
+            <h2>플레이어 1</h2>
+            <div id="dice-1" class="dice">?</div>
+            <br>
+            <button id="btn-1" class="btn-p1" onclick="roll(1)">P1 굴리기</button>
+        </div>
+        <div class="player-box">
+            <h2>플레이어 2</h2>
+            <div id="dice-2" class="dice">?</div>
+            <br>
+            <button id="btn-2" class="btn-p2" onclick="roll(2)">P2 굴리기</button>
+        </div>
+    </div>
+
+    <div id="result">대결 준비 완료!</div>
+
+    <button id="btn-reset" class="btn-reset" onclick="resetGame()">다시 하기</button>
+
+    <script>
+        let score1 = 0;
+        let score2 = 0;
+
+        function roll(playerNum) {
+            const btn = document.getElementById('btn-' + playerNum);
+            const dice = document.getElementById('dice-' + playerNum);
+            const resultText = document.getElementById('result');
+
+            btn.disabled = true;
+            dice.classList.add('rolling');
+            dice.innerText = '?';
+
+            resultText.style.color = '#ecf0f1';
+            resultText.innerHTML = "플레이어 " + playerNum + " 주사위 굴러가는 중...";
+
+            setTimeout(() => {
+                dice.classList.remove('rolling');
+
+                const score = Math.floor(Math.random() * 6) + 1;
+                dice.innerText = score;
+
+                if (playerNum === 1) {
+                    score1 = score;
+                } else {
+                    score2 = score;
+                }
+
+                checkResult();
+            }, 1000);
+        }
+
+        function checkResult() {
+            const resultText = document.getElementById('result');
+            const resetBtn = document.getElementById('btn-reset');
+
+            if (score1 > 0 && score2 > 0) {
+                resultText.style.color = '#f1c40f';
+                if (score1 > score2) {
+                    resultText.innerHTML = "플레이어 1 승리!";
+                } else if (score1 < score2) {
+                    resultText.innerHTML = "플레이어 2 승리!";
+                } else {
+                    resultText.innerHTML = "무승부!";
+                }
+                resetBtn.style.display = 'block';
+            } else {
+                resultText.style.color = '#ecf0f1';
+                resultText.innerHTML = "다른 플레이어도 주사위를 굴려주세요.";
+            }
+        }
+
+        function resetGame() {
+            score1 = 0;
+            score2 = 0;
+
+            document.getElementById('dice-1').innerText = '?';
+            document.getElementById('dice-2').innerText = '?';
+
+            document.getElementById('btn-1').disabled = false;
+            document.getElementById('btn-2').disabled = false;
+
+            document.getElementById('result').style.color = '#f1c40f';
+            document.getElementById('result').innerHTML = "대결 준비 완료!";
+
+            document.getElementById('btn-reset').style.display = 'none';
+        }
+    </script>
+
+</body>
+
+</html>
